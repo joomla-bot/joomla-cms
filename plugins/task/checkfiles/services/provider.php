@@ -36,7 +36,7 @@ return new class implements ServiceProviderInterface
 			{
 				$plugin = new Checkfiles(
 					$container->get(DispatcherInterface::class),
-					(array) PluginHelper::getPlugin('task', 'requests'),
+					(array) PluginHelper::getPlugin('task', 'checkfiles'),
 					JPATH_ROOT . '/images/'
 				);
 				$plugin->setApplication(Factory::getApplication());
