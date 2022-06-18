@@ -46,9 +46,9 @@ class RequestsPluginTest extends UnitTestCase
 		}
 
 		$image = imagecreate(200, 200);
-        imagecolorallocate($image, 255, 255, 0);
-        imagepng($image, __DIR__ . '/tmp/test.png');
-        imagedestroy($image);
+		imagecolorallocate($image, 255, 255, 0);
+		imagepng($image, __DIR__ . '/tmp/test.png');
+		imagedestroy($image);
 	}
 
 	/**
