@@ -59,12 +59,12 @@ class RequestsPluginTest extends UnitTestCase
 	 * @since   __DEPLOY_VERSION__
 	 */
 	public function tearDown(): void
-    {
+	{
 		if (is_dir(__DIR__ . '/tmp'))
 		{
 			Folder::delete(__DIR__ . '/tmp');
 		}
-    }
+	}
 
 	/**
 	 * @testdox  can resize an image
