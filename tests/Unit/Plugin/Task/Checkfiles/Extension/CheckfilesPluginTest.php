@@ -49,7 +49,7 @@ class RequestsPluginTest extends UnitTestCase
         imagecolorallocate($image, 255, 255, 0);
         imagepng($image, __DIR__ . '/tmp/test.png');
         imagedestroy($image);
-    }
+	}
 
 	/**
 	 * Cleanup
