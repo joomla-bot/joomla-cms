@@ -39,7 +39,7 @@ class RequestsPluginTest extends UnitTestCase
 	 * @since   __DEPLOY_VERSION__
 	 */
 	public function setUp(): void
-    {
+	{
 		if (!is_dir(__DIR__ . '/tmp'))
 		{
 			mkdir(__DIR__ . '/tmp');
