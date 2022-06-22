@@ -29,7 +29,7 @@ use Joomla\Tests\Unit\UnitTestCase;
  *
  * @since       __DEPLOY_VERSION__
  */
-class RequestsPluginTest extends UnitTestCase
+class CheckfilesPluginTest extends UnitTestCase
 {
 	/**
 	 * Setup
