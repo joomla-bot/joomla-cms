@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package     Joomla.Plugins
  * @subpackage  Task.CheckFiles
@@ -31,138 +32,130 @@ use LogicException;
  */
 final class Checkfiles extends CMSPlugin implements SubscriberInterface
 {
-	use TaskPluginTrait;
+    use TaskPluginTrait;
 
-	/**
-	 * @var string[]
-	 *
-	 * @since 4.1.0
-	 */
-	protected const TASKS_MAP = [
-		'checkfiles.imagesize' => [
-			'langConstPrefix' => 'PLG_TASK_CHECK_FILES_TASK_IMAGE_SIZE',
-			'form'            => 'image_size',
-			'method'          => 'checkImages',
-		],
-	];
+    /**
+     * @var string[]
+     *
+     * @since 4.1.0
+     */
+    protected const TASKS_MAP = [
+        'checkfiles.imagesize' => [
+            'langConstPrefix' => 'PLG_TASK_CHECK_FILES_TASK_IMAGE_SIZE',
+            'form'            => 'image_size',
+            'method'          => 'checkImages',
+        ],
+    ];
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @return string[]
-	 *
-	 * @since 4.1.0
-	 */
-	public static function getSubscribedEvents(): array
-	{
-		return [
-			'onTaskOptionsList'    => 'advertiseRoutines',
-			'onExecuteTask'        => 'standardRoutineHandler',
-			'onContentPrepareForm' => 'enhanceTaskItemForm',
-		];
-	}
+    /**
+     * @inheritDoc
+     *
+     * @return string[]
+     *
+     * @since 4.1.0
+     */
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            'onTaskOptionsList'    => 'advertiseRoutines',
+            'onExecuteTask'        => 'standardRoutineHandler',
+            'onContentPrepareForm' => 'enhanceTaskItemForm',
+        ];
+    }
 
-	/**
-	 * @var boolean
-	 * @since 4.1.0
-	 */
-	protected $autoloadLanguage = true;
+    /**
+     * @var boolean
+     * @since 4.1.0
+     */
+    protected $autoloadLanguage = true;
 
-	/**
-	 * The root directory path
-	 *
-	 * @var    string
-	 * @since  __DEPLOY_VERSION__
-	 */
-	private $rootDirectory;
+    /**
+     * The root directory path
+     *
+     * @var    string
+     * @since  __DEPLOY_VERSION__
+     */
+    private $rootDirectory;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param   DispatcherInterface  $dispatcher     The dispatcher
-	 * @param   array                $config         An optional associative array of configuration settings
-	 * @param   string               $rootDirectory  The root directory to look for images
-	 *
-	 * @since   __DEPLOY_VERSION__
-	 */
-	public function __construct(DispatcherInterface $dispatcher, array $config, string $rootDirectory)
-	{
-		parent::__construct($dispatcher, $config);
+    /**
+     * Constructor.
+     *
+     * @param   DispatcherInterface  $dispatcher     The dispatcher
+     * @param   array                $config         An optional associative array of configuration settings
+     * @param   string               $rootDirectory  The root directory to look for images
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    public function __construct(DispatcherInterface $dispatcher, array $config, string $rootDirectory)
+    {
+        parent::__construct($dispatcher, $config);
 
-		$this->rootDirectory = $rootDirectory;
-	}
+        $this->rootDirectory = $rootDirectory;
+    }
 
-	/**
-	 * @param   ExecuteTaskEvent  $event  The onExecuteTask event
-	 *
-	 * @return integer  The exit code
-	 *
-	 * @since 4.1.0
-	 * @throws RuntimeException
-	 * @throws LogicException
-	 */
-	protected function checkImages(ExecuteTaskEvent $event): int
-	{
-		$params    = $event->getArgument('params');
-		$path      = Path::check($this->rootDirectory . $params->path);
-		$dimension = $params->dimension;
-		$limit     = $params->limit;
-		$numImages = max(1, (int) $params->numImages ?? 1);
+    /**
+     * @param   ExecuteTaskEvent  $event  The onExecuteTask event
+     *
+     * @return integer  The exit code
+     *
+     * @since 4.1.0
+     * @throws RuntimeException
+     * @throws LogicException
+     */
+    protected function checkImages(ExecuteTaskEvent $event): int
+    {
+        $params    = $event->getArgument('params');
+        $path      = Path::check($this->rootDirectory . $params->path);
+        $dimension = $params->dimension;
+        $limit     = $params->limit;
+        $numImages = max(1, (int) $params->numImages ?? 1);
 
-		if (!is_dir($path))
-		{
-			$this->logTask($this->translate('PLG_TASK_CHECK_FILES_LOG_IMAGE_PATH_NA'), 'warning');
+        if (!is_dir($path)) {
+            $this->logTask($this->translate('PLG_TASK_CHECK_FILES_LOG_IMAGE_PATH_NA'), 'warning');
 
-			return TaskStatus::NO_RUN;
-		}
+            return TaskStatus::NO_RUN;
+        }
 
-		foreach (Folder::files($path, '^.*\.(jpg|jpeg|png|gif|webp)', 2, true) as $imageFilename)
-		{
-			$properties = Image::getImageFileProperties($imageFilename);
-			$resize     = $properties->$dimension > $limit;
+        foreach (Folder::files($path, '^.*\.(jpg|jpeg|png|gif|webp)', 2, true) as $imageFilename) {
+            $properties = Image::getImageFileProperties($imageFilename);
+            $resize     = $properties->$dimension > $limit;
 
-			if (!$resize)
-			{
-				continue;
-			}
+            if (!$resize) {
+                continue;
+            }
 
-			$height = $properties->height;
-			$width  = $properties->width;
+            $height = $properties->height;
+            $width  = $properties->width;
 
-			$newHeight = $dimension === 'height' ? $limit : $height * $limit / $width;
-			$newWidth  = $dimension === 'width' ? $limit : $width * $limit / $height;
+            $newHeight = $dimension === 'height' ? $limit : $height * $limit / $width;
+            $newWidth  = $dimension === 'width' ? $limit : $width * $limit / $height;
 
-			$this->logTask($this->translate('PLG_TASK_CHECK_FILES_LOG_RESIZING_IMAGE', $width, $height, $newWidth, $newHeight, $imageFilename));
+            $this->logTask($this->translate('PLG_TASK_CHECK_FILES_LOG_RESIZING_IMAGE', $width, $height, $newWidth, $newHeight, $imageFilename));
 
-			$image = new Image($imageFilename);
+            $image = new Image($imageFilename);
 
-			try
-			{
-				$image->resize($newWidth, $newHeight, false);
-			}
-			catch (LogicException $e)
-			{
-				$this->logTask($this->translate('PLG_TASK_CHECK_FILES_LOG_RESIZE_FAIL'), 'error');
+            try {
+                $image->resize($newWidth, $newHeight, false);
+            } catch (LogicException $e) {
+                $this->logTask($this->translate('PLG_TASK_CHECK_FILES_LOG_RESIZE_FAIL'), 'error');
 
-				return TaskStatus::KNOCKOUT;
-			}
+                return TaskStatus::KNOCKOUT;
+            }
 
-			if (!$image->toFile($imageFilename, $properties->type))
-			{
-				$this->logTask($this->translate('PLG_TASK_CHECK_FILES_LOG_IMAGE_SAVE_FAIL'), 'error');
+            if (!$image->toFile($imageFilename, $properties->type)) {
+                $this->logTask($this->translate('PLG_TASK_CHECK_FILES_LOG_IMAGE_SAVE_FAIL'), 'error');
 
-				return TaskStatus::KNOCKOUT;
-			}
+                return TaskStatus::KNOCKOUT;
+            }
 
-			--$numImages;
+            --$numImages;
 
-			// We do a limited number of resize per execution
-			if ($numImages == 0)
-			{
-				break;
-			}
-		}
+            // We do a limited number of resize per execution
+            if ($numImages == 0) {
+                break;
+            }
+        }
 
-		return TaskStatus::OK;
-	}
+        return TaskStatus::OK;
+    }
 }
